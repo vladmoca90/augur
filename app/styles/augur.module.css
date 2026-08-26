@@ -29,6 +29,13 @@ body {
   text-transform: uppercase;
 }
 
+.lazy-loading-text {
+  color: #000;
+  font-size: 1.25rem; 
+  margin: 2rem 0 0;
+  text-align: center;
+}
+
 .error-text {
   color: #8e0404;
   font-size: 1.25rem;
