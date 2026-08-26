@@ -29,6 +29,12 @@ body {
   text-transform: uppercase;
 }
 
+.error-text {
+  color: #8e0404;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
 .filter-container {
   display: flex;
   justify-content: space-between;
