@@ -29,6 +29,12 @@ body {
   text-transform: uppercase;
 }
 
+.filter-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
 .map-container {
   height: 480px;
   margin-bottom: 2rem;
