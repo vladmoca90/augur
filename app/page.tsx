@@ -1,5 +1,5 @@
 "use client";
-import styles from "./Augur.module.css";
+import styles from "./styles/augur.module.css";
 import LiveComponent from "./components/LiveComponent";
 
 export default function AugurExercise() {
