@@ -1,11 +1,19 @@
 "use client";
+
 import dynamic from "next/dynamic";
 import type { MapComponentProps } from "../types/map";
-import LiveMapComponent from "./LiveMapComponent";
 
-dynamic(() => import("./LiveMapComponent"), {
-  ssr: false,
-})
+const LiveMapComponent = dynamic(
+  () => import("./LiveMapComponent"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[500px] items-center justify-center text-black">
+        Loading map...
+      </div>
+    ),
+  },
+);
 
 export default function MapComponent({
   venues,
