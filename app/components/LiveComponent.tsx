@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { allUrls } from "../api/api";
 import type { Venue } from "../types/venues";
+import MapComponent from "./MapComponent";
 import type {
   DetectionEvent,
   EventType,
@@ -148,7 +149,6 @@ export default function LiveComponent() {
           <label htmlFor="type" className="font-medium text-black">
             Event type
           </label>
-
           <select
             id="type"
             value={selectedType}
@@ -158,22 +158,16 @@ export default function LiveComponent() {
             className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">All types</option>
-
             <option value="crowd-density">Crowd density</option>
-
             <option value="unauthorised-access">Unauthorised access</option>
-
             <option value="unattended-object">Unattended object</option>
-
             <option value="fight">Fight</option>
           </select>
         </div>
-
         <div className="flex w-full justify-between gap-2">
           <label htmlFor="severity" className="font-medium text-black">
             Severity
           </label>
-
           <select
             id="severity"
             value={selectedSeverity}
@@ -183,11 +177,8 @@ export default function LiveComponent() {
             className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">All severities</option>
-
             <option value="low">Low</option>
-
             <option value="medium">Medium</option>
-
             <option value="high">High</option>
           </select>
         </div>
@@ -204,13 +195,16 @@ export default function LiveComponent() {
           </p>
         )}
       </div>
-
       <div className="overflow-x-auto border-t border-[#403939] p-4 text-black">
-        <p className="mb-4 font-semibold">Events received: {events.length}</p>
-
-        <pre className="text-sm">
-          {JSON.stringify(events.slice(0, 5), null, 2)}
-        </pre>
+        <p className="p-4 text-black">
+          Events received:{" "}
+          <strong>{events.length}</strong>
+        </p>
+        <MapComponent
+          venues={venues}
+          events={events}
+          selectedVenueId={selectedVenueId}
+        />
       </div>
     </section>
   );
