@@ -4,7 +4,12 @@ import Image from "next/image";
 import styles from "../styles/augur.module.css";
 import { allUrls } from "./../api/api";
 import { Venue } from "../types/venues";
-import { DetectionEvent, EventType, Severity, StreamStatus } from "../types/events";
+import {
+  DetectionEvent,
+  EventType,
+  Severity,
+  StreamStatus,
+} from "../types/events";
 import { EventFilters } from "../types/filters";
 import { buildEventStreamUrl } from "./StreamEventComponent";
 
@@ -17,6 +22,7 @@ export default function LiveComponent() {
   const [selectedSeverity, setSelectedSeverity] = useState<Severity | "">("");
   const [events, setEvents] = useState<DetectionEvent[]>([]);
   const [streamStatus, setStreamStatus] = useState<StreamStatus>("connecting");
+  const [streamError, setStreamError] = useState<string | null>(null);
 
   const filters: EventFilters = {
     venueId: selectedVenueId,
@@ -47,7 +53,39 @@ export default function LiveComponent() {
 
   useEffect(() => {
     getVenues();
-  }, [getVenues]);
+
+    const filters: EventFilters = {
+      venueId: selectedVenueId,
+      type: selectedType,
+      severity: selectedSeverity,
+    };
+
+    const streamUrl = buildEventStreamUrl(filters);
+
+    setStreamStatus("connecting");
+    setStreamError(null);
+
+    const eventSource = new EventSource(streamUrl);
+
+    eventSource.onopen = () => {
+      setStreamStatus("connected");
+      setStreamError(null);
+    };
+
+    eventSource.addEventListener("detection", (event) => {
+      try {
+        const detectionEvent = JSON.parse(event.data) as DetectionEvent;
+
+        console.log("Detection:", detectionEvent);
+      } catch (error) {
+        console.error("Invalid detection event:", error);
+      }
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, [getVenues, selectedSeverity, selectedType, selectedVenueId]);
 
   if (isLoading) {
     return (
