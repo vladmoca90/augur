@@ -15,6 +15,7 @@ import { buildEventStreamUrl } from "./StreamEventComponent";
 
 export default function LiveComponent() {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const [events, setEvents] = useState<DetectionEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVenueId, setSelectedVenueId] = useState("");
@@ -22,7 +23,7 @@ export default function LiveComponent() {
   const [selectedSeverity, setSelectedSeverity] = useState<Severity | "">("");
   const [streamStatus, setStreamStatus] = useState<StreamStatus>("connecting");
   const [streamError, setStreamError] = useState<string | null>(null);
-  
+
   const filters: EventFilters = {
     venueId: selectedVenueId,
     type: selectedType,
@@ -45,11 +46,7 @@ export default function LiveComponent() {
     } catch (error) {
       console.error("Failed to fetch venues:", error);
 
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong",
-      );
+      setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -70,32 +67,22 @@ export default function LiveComponent() {
       setStreamError(null);
     };
 
-    eventSource.addEventListener(
-      "detection",
-      (event: MessageEvent<string>) => {
-        try {
-          const detectionEvent =
-            JSON.parse(event.data) as DetectionEvent;
+    eventSource.addEventListener("detection", (event: MessageEvent<string>) => {
+      try {
+        const detectionEvent = JSON.parse(event.data) as DetectionEvent;
 
-          console.log(
-            "Detection:",
-            detectionEvent,
-          );
-        } catch (error) {
-          console.error(
-            "Invalid detection event:",
-            error,
-          );
-        }
-      },
-    );
+        setEvents((currentEvents) =>
+          [detectionEvent, ...currentEvents].slice(0, 200),
+        );
+      } catch (error) {
+        console.error("Invalid detection event:", error);
+      }
+    });
 
     eventSource.onerror = () => {
       setStreamStatus("reconnecting");
 
-      setStreamError(
-        "Live stream disconnected. Reconnecting...",
-      );
+      setStreamError("Live stream disconnected. Reconnecting...");
     };
 
     return () => {
@@ -113,19 +100,14 @@ export default function LiveComponent() {
           height={150}
         />
 
-        <p className="mt-8 text-center text-xl text-black">
-          Loading venues...
-        </p>
+        <p className="mt-8 text-center text-xl text-black">Loading venues...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <p
-        className="text-center text-xl text-red-800"
-        role="alert"
-      >
+      <p className="text-center text-xl text-red-800" role="alert">
         {error}
       </p>
     );
@@ -142,32 +124,20 @@ export default function LiveComponent() {
       <div className="flex flex-col items-center gap-4 p-4">
         {/* Venue */}
         <div className="flex w-full justify-between gap-2">
-          <label
-            htmlFor="venue"
-            className="font-medium text-black"
-          >
+          <label htmlFor="venue" className="font-medium text-black">
             Venue
           </label>
 
           <select
             id="venue"
             value={selectedVenueId}
-            onChange={(event) =>
-              setSelectedVenueId(
-                event.target.value,
-              )
-            }
+            onChange={(event) => setSelectedVenueId(event.target.value)}
             className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="">
-              All venues
-            </option>
+            <option value="">All venues</option>
 
             {venues.map((venue) => (
-              <option
-                key={venue.id}
-                value={venue.id}
-              >
+              <option key={venue.id} value={venue.id}>
                 {venue.name}
               </option>
             ))}
@@ -176,10 +146,7 @@ export default function LiveComponent() {
 
         {/* Event type */}
         <div className="flex w-full justify-between gap-2">
-          <label
-            htmlFor="type"
-            className="font-medium text-black"
-          >
+          <label htmlFor="type" className="font-medium text-black">
             Event type
           </label>
 
@@ -187,42 +154,25 @@ export default function LiveComponent() {
             id="type"
             value={selectedType}
             onChange={(event) =>
-              setSelectedType(
-                event.target.value as
-                  | EventType
-                  | "",
-              )
+              setSelectedType(event.target.value as EventType | "")
             }
             className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="">
-              All types
-            </option>
+            <option value="">All types</option>
 
-            <option value="crowd-density">
-              Crowd density
-            </option>
+            <option value="crowd-density">Crowd density</option>
 
-            <option value="unauthorised-access">
-              Unauthorised access
-            </option>
+            <option value="unauthorised-access">Unauthorised access</option>
 
-            <option value="unattended-object">
-              Unattended object
-            </option>
+            <option value="unattended-object">Unattended object</option>
 
-            <option value="fight">
-              Fight
-            </option>
+            <option value="fight">Fight</option>
           </select>
         </div>
 
         {/* Severity */}
         <div className="flex w-full justify-between gap-2">
-          <label
-            htmlFor="severity"
-            className="font-medium text-black"
-          >
+          <label htmlFor="severity" className="font-medium text-black">
             Severity
           </label>
 
@@ -230,29 +180,17 @@ export default function LiveComponent() {
             id="severity"
             value={selectedSeverity}
             onChange={(event) =>
-              setSelectedSeverity(
-                event.target.value as
-                  | Severity
-                  | "",
-              )
+              setSelectedSeverity(event.target.value as Severity | "")
             }
             className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="">
-              All severities
-            </option>
+            <option value="">All severities</option>
 
-            <option value="low">
-              Low
-            </option>
+            <option value="low">Low</option>
 
-            <option value="medium">
-              Medium
-            </option>
+            <option value="medium">Medium</option>
 
-            <option value="high">
-              High
-            </option>
+            <option value="high">High</option>
           </select>
         </div>
       </div>
@@ -260,15 +198,11 @@ export default function LiveComponent() {
       {/* Stream status */}
       <div className="border-t border-[#403939] p-4 text-black">
         <p>
-          Stream status:{" "}
-          <strong>{streamStatus}</strong>
+          Stream status: <strong>{streamStatus}</strong>
         </p>
 
         {streamError && (
-          <p
-            className="mt-2 text-red-700"
-            role="alert"
-          >
+          <p className="mt-2 text-red-700" role="alert">
             {streamError}
           </p>
         )}
@@ -276,13 +210,7 @@ export default function LiveComponent() {
 
       {/* Temporary debugging */}
       <div className="overflow-x-auto border-t border-[#403939] p-4 text-black">
-        <pre>
-          {JSON.stringify(
-            venues,
-            null,
-            2,
-          )}
-        </pre>
+        <pre>{JSON.stringify(venues, null, 2)}</pre>
       </div>
     </section>
   );
