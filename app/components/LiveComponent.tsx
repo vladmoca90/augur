@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import styles from "../styles/augur.module.css";
-import { error } from "next/dist/build/output/log";
 import { Venues } from "../types/venues";
 
 const baseUrl = "https://frontend-takehome-server-production.up.railway.app";
@@ -16,17 +16,24 @@ export default function LiveComponent() {
 
   const getVenues = useCallback(async () => {
     try {
-      const response = await fetch(venuesUrl);
+      const res = await fetch(venuesUrl);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!res.ok) {
+        throw new Error("The data is not valid!");
       }
 
-      const data = await response.json();
-      console.log("Venues data:", data);
+      const data = await res.json();
       setVenues(data);
     } catch (error) {
-      console.error("Error fetching venues:", error);
+      console.error("Failed to fetch venues:", error);
+
+      setError(
+    error instanceof Error
+      ? error.message
+      : "Something went wrong"
+  );
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -34,33 +41,47 @@ export default function LiveComponent() {
     getVenues();
   }, [getVenues]);
 
+  if (isLoading) {
+    return (
+      <div className="loading-overlay">
+        <Image
+          src="/images/loading-spinner.gif"
+          alt="Loading..."
+          width={150}
+          height={150}
+          className="loading-spinner"
+        />
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <p className={styles.error} role="alert">
+        {error}
+      </p>
+    );
+  }
+
   return (
     <section className={styles["live-component"]}>
       <header>
         <h1 className={styles["header"]}>Augur exercise</h1>
       </header>
-      {isLoading && <p className="lazy-loading-text">Loading...</p>}
-      {error && <p className="error-text">Error loading venues: {error}</p>}
-      {!isLoading && !error && (
-        <>
-          <div className={styles["filter-container"]}>
-            <label htmlFor="venue">Venue</label>
-            <select
-              id="venue"
-              value={selectedVenueId}
-              onChange={(e) => setSelectedVenueId(e.target.value)}
-            >
-              <option value="">Select a venue</option>
-              {venues.map((venue) => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </>
-      )}
-
+      <div className={styles["filter-container"]}>
+        <label htmlFor="venue">Venue</label>
+        <select
+          id="venue"
+          value={selectedVenueId}
+          onChange={(e) => setSelectedVenueId(e.target.value)}
+        >
+          <option value="">Select a venue</option>
+          {venues.map((venue) => (
+            <option key={venue.id} value={venue.id}>
+              {venue.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className={styles["map-container"]}></div>
     </section>
   );
