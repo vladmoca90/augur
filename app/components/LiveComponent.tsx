@@ -41,48 +41,78 @@ export default function LiveComponent() {
     getVenues();
   }, [getVenues]);
 
-  if (isLoading) {
+   if (isLoading) {
     return (
-      <div className="loading-overlay">
+      <div className="flex flex-col items-center justify-center">
         <Image
           src="/images/loading-spinner.gif"
-          alt="Loading..."
+          alt="Loading venues"
           width={150}
           height={150}
-          className="loading-spinner"
         />
+
+        <p className="mt-8 text-center text-xl text-black">
+          Loading venues...
+        </p>
       </div>
     );
   }
+
   if (error) {
     return (
-      <p className={styles.error} role="alert">
+      <p
+        className="text-center text-xl text-red-800"
+        role="alert"
+      >
         {error}
       </p>
     );
   }
 
   return (
-    <section className={styles["live-component"]}>
+    <section className="mx-auto w-full max-w-[550px] overflow-hidden rounded-xl border border-[#403939] bg-white">
       <header>
-        <h1 className={styles["header"]}>Augur exercise</h1>
+        <h1 className="m-0 border-b border-[#403939] py-4 text-center text-xl font-semibold uppercase text-black">
+          Augur Exercise
+        </h1>
       </header>
-      <div className={styles["filter-container"]}>
-        <label htmlFor="venue">Venue</label>
+
+      <div className="flex items-center justify-between gap-4 p-4">
+        <label
+          htmlFor="venue"
+          className="font-medium text-black"
+        >
+          Venue
+        </label>
+
         <select
           id="venue"
           value={selectedVenueId}
-          onChange={(e) => setSelectedVenueId(e.target.value)}
+          onChange={(event) =>
+            setSelectedVenueId(
+              event.target.value
+            )
+          }
+          className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
         >
-          <option value="">Select a venue</option>
+          <option value="">
+            All venues
+          </option>
+
           {venues.map((venue) => (
-            <option key={venue.id} value={venue.id}>
+            <option
+              key={venue.id}
+              value={venue.id}
+            >
               {venue.name}
             </option>
           ))}
         </select>
       </div>
-      <div className={styles["map-container"]}></div>
+
+      <div className="mb-8 h-[480px] w-full bg-gray-100">
+        Map goes here
+      </div>
     </section>
   );
 }
