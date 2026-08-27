@@ -34,29 +34,48 @@ function getEventColor(severity: DetectionEvent["severity"]) {
 
 interface MapControllerProps {
   venue?: Venue;
+  venues: Venue[];
 }
 
 function MapController({
   venue,
+  venues,
 }: MapControllerProps) {
   const map = useMap();
 
   useEffect(() => {
-    if (!venue) {
+    if (venue) {
+      map.fitBounds([
+        [
+          venue.bounds.south,
+          venue.bounds.west,
+        ],
+        [
+          venue.bounds.north,
+          venue.bounds.east,
+        ],
+      ]);
+
       return;
     }
 
-    map.fitBounds([
-      [
-        venue.bounds.south,
-        venue.bounds.west,
-      ],
-      [
-        venue.bounds.north,
-        venue.bounds.east,
-      ],
-    ]);
-  }, [map, venue]);
+    if (venues.length > 0) {
+      const venueCenters = venues.map(
+        (venue) =>
+          [
+            venue.center.lat,
+            venue.center.lng,
+          ] as [number, number],
+      );
+
+      map.fitBounds(
+        venueCenters,
+        {
+          padding: [30, 30],
+        },
+      );
+    }
+  }, [map, venue, venues]);
 
   return null;
 }
@@ -78,6 +97,7 @@ export default function LiveMap({
         zoom={10}
         className="h-full w-full"
          venue={selectedVenue}
+        venues={venues}
       >
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
