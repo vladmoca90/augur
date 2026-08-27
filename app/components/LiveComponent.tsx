@@ -2,14 +2,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "../styles/augur.module.css";
-import { Venues } from "../types/venues";
-
-const baseUrl = "https://frontend-takehome-server-production.up.railway.app";
-const venuesUrl = `${baseUrl}/api/venues`;
-const eventsUrl = `${baseUrl}/api/events/stream`;
+import { allUrls } from "./../api/api";
+import { Venue } from "../types/venues";
 
 export default function LiveComponent() {
-  const [venues, setVenues] = useState<Venues[]>([]);
+  const [venues, setVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVenueId, setSelectedVenueId] = useState("");
@@ -18,7 +15,7 @@ export default function LiveComponent() {
 
   const getVenues = useCallback(async () => {
     try {
-      const res = await fetch(venuesUrl);
+      const res = await fetch(allUrls.venues);
 
       if (!res.ok) {
         throw new Error("The data is not valid!");
@@ -124,7 +121,7 @@ export default function LiveComponent() {
         </div>
       </div>
       <div className="map-container overflow-x-auto">
-
+        {JSON.stringify(venues, null, 2)}
       </div>
     </section>
   );
