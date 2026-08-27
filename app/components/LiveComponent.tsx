@@ -52,40 +52,64 @@ export default function LiveComponent() {
   }, []);
 
   useEffect(() => {
-    getVenues();
+  getVenues();
+}, [getVenues]);
 
-    const filters: EventFilters = {
-      venueId: selectedVenueId,
-      type: selectedType,
-      severity: selectedSeverity,
-    };
+useEffect(() => {
+  getVenues();
+}, [getVenues]);
 
-    const streamUrl = buildEventStreamUrl(filters);
+useEffect(() => {
+  setStreamStatus("connecting");
+  setStreamError(null);
 
-    setStreamStatus("connecting");
+  const eventSource = new EventSource(streamUrl);
+
+  eventSource.onopen = () => {
+    setStreamStatus("connected");
     setStreamError(null);
+  };
 
-    const eventSource = new EventSource(streamUrl);
+  eventSource.addEventListener("detection", (event) => {
+    try {
+      const detectionEvent = JSON.parse(event.data) as DetectionEvent;
 
-    eventSource.onopen = () => {
-      setStreamStatus("connected");
-      setStreamError(null);
-    };
+      console.log("Detection:", detectionEvent);
+    } catch (error) {
+      console.error("Invalid detection event:", error);
+    }
+  });
 
-    eventSource.addEventListener("detection", (event) => {
-      try {
-        const detectionEvent = JSON.parse(event.data) as DetectionEvent;
+  return () => {
+    eventSource.close();
+  };
+}, [streamUrl]);
 
-        console.log("Detection:", detectionEvent);
-      } catch (error) {
-        console.error("Invalid detection event:", error);
-      }
-    });
+useEffect(() => {
+  setStreamStatus("connecting");
+  setStreamError(null);
 
-    return () => {
-      eventSource.close();
-    };
-  }, [getVenues, selectedSeverity, selectedType, selectedVenueId]);
+  const eventSource = new EventSource(streamUrl);
+
+  eventSource.onopen = () => {
+    setStreamStatus("connected");
+    setStreamError(null);
+  };
+
+  eventSource.addEventListener("detection", (event) => {
+    try {
+      const detectionEvent = JSON.parse(event.data) as DetectionEvent;
+
+      console.log("Detection:", detectionEvent);
+    } catch (error) {
+      console.error("Invalid detection event:", error);
+    }
+  });
+
+  return () => {
+    eventSource.close();
+  };
+}, [streamUrl]);
 
   if (isLoading) {
     return (
