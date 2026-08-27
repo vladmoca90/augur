@@ -122,7 +122,6 @@ export default function LiveComponent() {
       </header>
 
       <div className="flex flex-col items-center gap-4 p-4">
-        {/* Venue */}
         <div className="flex w-full justify-between gap-2">
           <label htmlFor="venue" className="font-medium text-black">
             Venue
@@ -144,7 +143,6 @@ export default function LiveComponent() {
           </select>
         </div>
 
-        {/* Event type */}
         <div className="flex w-full justify-between gap-2">
           <label htmlFor="type" className="font-medium text-black">
             Event type
@@ -170,7 +168,6 @@ export default function LiveComponent() {
           </select>
         </div>
 
-        {/* Severity */}
         <div className="flex w-full justify-between gap-2">
           <label htmlFor="severity" className="font-medium text-black">
             Severity
@@ -195,7 +192,6 @@ export default function LiveComponent() {
         </div>
       </div>
 
-      {/* Stream status */}
       <div className="border-t border-[#403939] p-4 text-black">
         <p>
           Stream status: <strong>{streamStatus}</strong>
@@ -208,9 +204,12 @@ export default function LiveComponent() {
         )}
       </div>
 
-      {/* Temporary debugging */}
       <div className="overflow-x-auto border-t border-[#403939] p-4 text-black">
-        <pre>{JSON.stringify(venues, null, 2)}</pre>
+        <p className="mb-4 font-semibold">Events received: {events.length}</p>
+
+        <pre className="text-sm">
+          {JSON.stringify(events.slice(0, 5), null, 2)}
+        </pre>
       </div>
     </section>
   );
