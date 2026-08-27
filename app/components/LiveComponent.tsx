@@ -57,6 +57,7 @@ export default function LiveComponent() {
   }, [getVenues]);
 
   useEffect(() => {
+    setEvents([]);
     setStreamStatus("connecting");
     setStreamError(null);
 
