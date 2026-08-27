@@ -1,20 +1,11 @@
 "use client";
 import dynamic from "next/dynamic";
-import type { DetectionEvent } from "../types/events";
-import type { Venue } from "../types/venues";
-import { MapComponentProps } from "../types/map";
+import type { MapComponentProps } from "../types/map";
+import LiveMapComponent from "./LiveMapComponent";
 
-const LiveMap = dynamic(
-  () => import("./LiveMapComponent"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-[500px] items-center justify-center text-black">
-        Loading map...
-      </div>
-    ),
-  },
-);
+dynamic(() => import("./LiveMapComponent"), {
+  ssr: false,
+})
 
 export default function MapComponent({
   venues,
@@ -22,7 +13,7 @@ export default function MapComponent({
   selectedVenueId,
 }: MapComponentProps) {
   return (
-    <LiveMap
+    <LiveMapComponent
       venues={venues}
       events={events}
       selectedVenueId={selectedVenueId}
