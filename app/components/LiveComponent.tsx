@@ -11,6 +11,7 @@ import {
   Severity,
   StreamStatus,
 } from "../types/events";
+import loadingImage from "../images/loading-buffering.gif";
 import type { Venue } from "../types/venues";
 import type { EventFilters } from "../types/filters";
 import { buildEventStreamUrl } from "./StreamEventComponent";
@@ -150,10 +151,10 @@ export default function LiveComponent() {
     return (
       <div className="flex flex-col items-center justify-center">
         <Image
-          src="/images/loading-buffering.gif"
+          src={loadingImage}
           alt="Loading venues"
-          width={150}
-          height={150}
+          width={120}
+          height={120}
         />
 
         <p className="mt-8 text-center text-xl text-black">
