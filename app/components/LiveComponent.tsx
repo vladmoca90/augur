@@ -4,6 +4,7 @@ import Image from "next/image";
 import styles from "../styles/augur.module.css";
 import { allUrls } from "./../api/api";
 import { Venue } from "../types/venues";
+import { DetectionEvent, StreamStatus } from "../types/events";
 
 export default function LiveComponent() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -12,6 +13,8 @@ export default function LiveComponent() {
   const [selectedVenueId, setSelectedVenueId] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedSeverity, setSelectedSeverity] = useState("");
+  const [events, setEvents] = useState<DetectionEvent[]>([]);
+  const [streamStatus, setStreamStatus] = useState<StreamStatus>("connecting");
 
   const getVenues = useCallback(async () => {
     try {

@@ -5,11 +5,7 @@ export type Severity =
   "medium" |
   "high";
 
-export type EventType =
-  | "crowd-density"
-  | "unauthorised-access"
-  | "unattended-object"
-  | "fight";
+export type EventType = "crowd-density" | "unauthorised-access" | "unattended-object" | "fight";
 
 export interface DetectionEvent {
   id: string;
@@ -19,3 +15,5 @@ export interface DetectionEvent {
   type: string;
   severity: Severity;
 }
+
+export type StreamStatus = "connecting" | "connected" | "reconnecting";
