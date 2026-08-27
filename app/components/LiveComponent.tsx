@@ -1,29 +1,51 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import Image from "next/image";
 import { allUrls } from "../api/api";
-import type { Venue } from "../types/venues";
-import MapComponent from "./MapComponent";
-import type {
+import {
   DetectionEvent,
   EventType,
   Severity,
   StreamStatus,
 } from "../types/events";
+import type { Venue } from "../types/venues";
 import type { EventFilters } from "../types/filters";
-
 import { buildEventStreamUrl } from "./StreamEventComponent";
+import FiltersComponent from "./FilterMapComponent";
+import MapComponent from "./MapComponent";
 
 export default function LiveComponent() {
-  const [venues, setVenues] = useState<Venue[]>([]);
-  const [events, setEvents] = useState<DetectionEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedVenueId, setSelectedVenueId] = useState("");
-  const [selectedType, setSelectedType] = useState<EventType | "">("");
-  const [selectedSeverity, setSelectedSeverity] = useState<Severity | "">("");
-  const [streamStatus, setStreamStatus] = useState<StreamStatus>("connecting");
-  const [streamError, setStreamError] = useState<string | null>(null);
+  const [venues, setVenues] =
+    useState<Venue[]>([]);
+
+  const [events, setEvents] =
+    useState<DetectionEvent[]>([]);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [selectedVenueId, setSelectedVenueId] =
+    useState("");
+
+  const [selectedType, setSelectedType] =
+    useState<EventType | "">("");
+
+  const [
+    selectedSeverity,
+    setSelectedSeverity,
+  ] = useState<Severity | "">("");
+
+  const [streamStatus, setStreamStatus] =
+    useState<StreamStatus>("connecting");
+
+  const [streamError, setStreamError] =
+    useState<string | null>(null);
 
   const filters: EventFilters = {
     venueId: selectedVenueId,
@@ -31,60 +53,92 @@ export default function LiveComponent() {
     severity: selectedSeverity,
   };
 
-  const streamUrl = buildEventStreamUrl(filters);
-
-  const getVenues = useCallback(async () => {
-    try {
-      const res = await fetch(allUrls.venues);
-
-      if (!res.ok) {
-        throw new Error("Failed to load venues.");
-      }
-
-      const data: Venue[] = await res.json();
-
-      setVenues(data);
-    } catch (error) {
-      console.error("Failed to fetch venues:", error);
-
-      setError(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const streamUrl =
+    buildEventStreamUrl(filters);
 
   useEffect(() => {
+    const getVenues = async () => {
+      try {
+        const response =
+          await fetch(allUrls.venues);
+
+        if (!response.ok) {
+          throw new Error(
+            "Failed to load venues.",
+          );
+        }
+
+        const data: Venue[] =
+          await response.json();
+
+        setVenues(data);
+      } catch (error) {
+        console.error(
+          "Failed to fetch venues:",
+          error,
+        );
+
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Something went wrong",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     getVenues();
-  }, [getVenues]);
+  }, []);
 
   useEffect(() => {
     setEvents([]);
     setStreamStatus("connecting");
     setStreamError(null);
 
-    const eventSource = new EventSource(streamUrl);
+    const eventSource =
+      new EventSource(streamUrl);
 
     eventSource.onopen = () => {
       setStreamStatus("connected");
       setStreamError(null);
     };
 
-    eventSource.addEventListener("detection", (event: MessageEvent<string>) => {
-      try {
-        const detectionEvent = JSON.parse(event.data) as DetectionEvent;
+    eventSource.addEventListener(
+      "detection",
+      (
+        event: MessageEvent<string>,
+      ) => {
+        try {
+          const detectionEvent =
+            JSON.parse(
+              event.data,
+            ) as DetectionEvent;
 
-        setEvents((currentEvents) =>
-          [detectionEvent, ...currentEvents].slice(0, 200),
-        );
-      } catch (error) {
-        console.error("Invalid detection event:", error);
-      }
-    });
+          setEvents(
+            (currentEvents) =>
+              [
+                detectionEvent,
+                ...currentEvents,
+              ].slice(0, 200),
+          );
+        } catch (error) {
+          console.error(
+            "Invalid detection event:",
+            error,
+          );
+        }
+      },
+    );
 
     eventSource.onerror = () => {
-      setStreamStatus("reconnecting");
+      setStreamStatus(
+        "reconnecting",
+      );
 
-      setStreamError("Live stream disconnected. Reconnecting...");
+      setStreamError(
+        "Live stream disconnected. Reconnecting...",
+      );
     };
 
     return () => {
@@ -102,108 +156,91 @@ export default function LiveComponent() {
           height={150}
         />
 
-        <p className="mt-8 text-center text-xl text-black">Loading venues...</p>
+        <p className="mt-8 text-center text-xl text-black">
+          Loading venues...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <p className="text-center text-xl text-red-800" role="alert">
+      <p
+        className="text-center text-xl text-red-800"
+        role="alert"
+      >
         {error}
       </p>
     );
   }
 
   return (
-    <section className="mx-auto w-full overflow-hidden rounded-xl border border-[#403939] bg-white">
+    <section className="mx-auto mt-4 w-full overflow-hidden rounded-xl border border-[#403939] bg-white md:max-w-[768px] lg:max-w-[992px]">
       <header>
-        <h1 className="m-0 border-b border-[#403939] py-4 text-center text-xl font-semibold uppercase text-black">
+        <h1 className="border-b border-[#403939] py-4 text-center text-xl font-semibold uppercase text-black">
           Augur Exercise
         </h1>
       </header>
 
-      <div className="flex flex-col items-center gap-4 p-4">
-        <div className="flex w-full justify-between gap-2">
-          <label htmlFor="venue" className="font-medium text-black">
-            Venue
-          </label>
-
-          <select
-            id="venue"
-            value={selectedVenueId}
-            onChange={(event) => setSelectedVenueId(event.target.value)}
-            className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
-          >
-            <option value="">All venues</option>
-
-            {venues.map((venue) => (
-              <option key={venue.id} value={venue.id}>
-                {venue.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex w-full justify-between gap-2">
-          <label htmlFor="type" className="font-medium text-black">
-            Event type
-          </label>
-          <select
-            id="type"
-            value={selectedType}
-            onChange={(event) =>
-              setSelectedType(event.target.value as EventType | "")
-            }
-            className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
-          >
-            <option value="">All types</option>
-            <option value="crowd-density">Crowd density</option>
-            <option value="unauthorised-access">Unauthorised access</option>
-            <option value="unattended-object">Unattended object</option>
-            <option value="fight">Fight</option>
-          </select>
-        </div>
-        <div className="flex w-full justify-between gap-2">
-          <label htmlFor="severity" className="font-medium text-black">
-            Severity
-          </label>
-          <select
-            id="severity"
-            value={selectedSeverity}
-            onChange={(event) =>
-              setSelectedSeverity(event.target.value as Severity | "")
-            }
-            className="rounded border border-[#403939] bg-white px-3 py-2 text-black outline-none focus:ring-2 focus:ring-black"
-          >
-            <option value="">All severities</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-      </div>
+      <FiltersComponent
+        venues={venues}
+        selectedVenueId={
+          selectedVenueId
+        }
+        selectedType={
+          selectedType
+        }
+        selectedSeverity={
+          selectedSeverity
+        }
+        onVenueChange={
+          setSelectedVenueId
+        }
+        onTypeChange={
+          setSelectedType
+        }
+        onSeverityChange={
+          setSelectedSeverity
+        }
+      />
 
       <div className="border-t border-[#403939] p-4 text-black">
         <p>
-          Stream status: <strong>{streamStatus}</strong>
+          Stream status:{" "}
+          <strong>
+            {streamStatus}
+          </strong>
         </p>
 
         {streamError && (
-          <p className="mt-2 text-red-700" role="alert">
+          <p
+            className="mt-2 text-red-700"
+            role="alert"
+          >
             {streamError}
           </p>
         )}
       </div>
-      <div className="overflow-x-auto border-t border-[#403939] p-4 text-black">
-        <p className="p-4 text-black">
-          Events received:{" "}
-          <strong>{events.length}</strong>
-        </p>
+
+      {events.length === 0 &&
+        streamStatus ===
+          "connected" && (
+          <p
+            className="border-t border-[#403939] p-4 text-center text-black"
+            aria-live="polite"
+          >
+            Waiting for detection
+            events...
+          </p>
+        )}
+
+      <div className="border-t border-[#403939]">
         <MapComponent
           venues={venues}
           events={events}
-          selectedVenueId={selectedVenueId}
+          selectedVenueId={
+            selectedVenueId
+          }
         />
       </div>
     </section>
