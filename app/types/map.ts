@@ -1,5 +1,5 @@
-import { DetectionEvent } from "./events";
-import { Venue } from "./venues";
+import type { DetectionEvent } from "./events";
+import type { Venue } from "./venues";
 
 export interface MapComponentProps {
   venues: Venue[];
