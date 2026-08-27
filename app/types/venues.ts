@@ -10,9 +10,9 @@ export interface VenueBounds {
   west: number;
 }
 
-export interface Venues {
-    id: number;
-    name: string;
-    center: Coordinates;
-    bounds: VenueBounds[];
+export interface Venue {
+  id: string;
+  name: string;
+  center: Coordinates;
+  bounds: VenueBounds;
 }
