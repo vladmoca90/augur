@@ -176,7 +176,7 @@ export default function LiveComponent() {
   }
 
   return (
-    <section className="mx-auto mt-4 w-full overflow-hidden border border-[#403939] bg-white md:max-w-[768px] lg:max-w-[992px]">
+    <section className="mx-auto mt-4 mb-4 w-full overflow-hidden border border-[#403939] bg-white md:max-w-[768px] lg:max-w-[992px]">
       <header>
         <h1 className="border-b border-[#403939] py-4 text-center text-xl font-semibold uppercase text-black">
           Augur Exercise
