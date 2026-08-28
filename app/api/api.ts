@@ -1,5 +1,4 @@
-export const baseUrl =
-  "https://frontend-takehome-server-production.up.railway.app";
+export const baseUrl = "https://frontend-takehome-server-production.up.railway.app";
 
 export const allUrls = {
   venues: `${baseUrl}/api/venues`,

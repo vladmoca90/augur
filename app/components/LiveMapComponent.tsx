@@ -21,7 +21,9 @@ interface MapControllerProps {
   venues: Venue[];
 }
 
-function getEventColor(severity: DetectionEvent["severity"]) {
+function getEventColor(
+  severity: DetectionEvent["severity"],
+) {
   switch (severity) {
     case "high":
       return "#940303";
@@ -35,6 +37,19 @@ function getEventColor(severity: DetectionEvent["severity"]) {
     default:
       return "#0838a1";
   }
+}
+
+function formatEventType(
+  type: DetectionEvent["type"],
+) {
+  return type
+    .split("-")
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1),
+    )
+    .join(" ");
 }
 
 function MapController({
@@ -77,19 +92,23 @@ function MapController({
   return null;
 }
 
-export default function LiveMap({
+export default function LiveMapComponent({
   venues,
   events,
   selectedVenueId,
 }: LiveMapProps) {
   const selectedVenue = venues.find(
-    (venue) => venue.id === selectedVenueId,
+    (venue) =>
+      venue.id === selectedVenueId,
   );
 
-  const getVenueName = (venueId: string) => {
+  const getVenueName = (
+    venueId: string,
+  ) => {
     return (
       venues.find(
-        (venue) => venue.id === venueId,
+        (venue) =>
+          venue.id === venueId,
       )?.name ?? venueId
     );
   };
@@ -123,20 +142,24 @@ export default function LiveMap({
               color: getEventColor(
                 event.severity,
               ),
-              fillColor: getEventColor(
-                event.severity,
-              ),
+              fillColor:
+                getEventColor(
+                  event.severity,
+                ),
               fillOpacity: 0.8,
             }}
           >
             <Popup>
               <div>
                 <strong>
-                  {event.type}
+                  {formatEventType(
+                    event.type,
+                  )}
                 </strong>
 
                 <p>
-                  Severity: {event.severity}
+                  Severity:{" "}
+                  {event.severity}
                 </p>
 
                 <p>

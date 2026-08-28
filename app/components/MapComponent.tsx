@@ -1,5 +1,4 @@
 "use client";
-
 import dynamic from "next/dynamic";
 import type { MapComponentProps } from "../types/map";
 
