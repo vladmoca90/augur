@@ -83,6 +83,20 @@ describe("MapComponent", () => {
     expect(received.selectedVenueId).toBe("venue-1");
   });
 
+  it("forwards new venues and events when the selection changes", async () => {
+    await act(async () => root.render(<MapComponent {...props} />));
+    const updated: MapComponentProps = {
+      venues: [{ ...props.venues[0], id: "venue-2", name: "Second venue" }],
+      events: [{ ...props.events[0], id: "event-2", venueId: "venue-2" }],
+      selectedVenueId: "venue-2",
+    };
+    await act(async () => root.render(<MapComponent {...updated} />));
+    const received = mockLiveMap.mock.lastCall![0];
+    expect(received.venues).toBe(updated.venues);
+    expect(received.events).toBe(updated.events);
+    expect(received.selectedVenueId).toBe("venue-2");
+  });
+
   it("forwards updated data and selection, including empty data", async () => {
     await act(async () => root.render(<MapComponent {...props} />));
     const updated: MapComponentProps = {
